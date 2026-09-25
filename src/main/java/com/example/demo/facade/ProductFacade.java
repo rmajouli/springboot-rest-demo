@@ -3,6 +3,7 @@ package com.example.demo.facade;
 import com.example.demo.dto.ProductRequest;
 import com.example.demo.dto.ProductResponse;
 import com.example.demo.entity.Product;
+import com.example.demo.exception.ProductNotFoundException;
 import com.example.demo.service.ProductService;
 import org.springframework.stereotype.Component;
 
@@ -25,7 +26,7 @@ public class ProductFacade {
 
     public ProductResponse getProductById(Long id) {
         Product product = productService.getProductById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Product not found with id: " + id));
+                .orElseThrow(() -> new ProductNotFoundException(id));
         return toResponse(product);
     }
 
@@ -48,7 +49,8 @@ public class ProductFacade {
     }
 
     public boolean deleteProduct(Long id) {
-        return productService.deleteProduct(id);
+        productService.deleteProduct(id);
+        return true;
     }
 
     private ProductResponse toResponse(Product product) {

@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.entity.Product;
+import com.example.demo.exception.ProductNotFoundException;
 import com.example.demo.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +31,7 @@ public class ProductService {
 
     public Product updateProduct(Long id, Product updatedProduct) {
         Product existingProduct = productRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Product not found with id: " + id));
+                .orElseThrow(() -> new ProductNotFoundException(id));
 
         existingProduct.setName(updatedProduct.getName());
         existingProduct.setPrice(updatedProduct.getPrice());
@@ -40,7 +41,7 @@ public class ProductService {
 
     public boolean deleteProduct(Long id) {
         if (!productRepository.existsById(id)) {
-            return false;
+            throw new ProductNotFoundException(id);
         }
 
         productRepository.deleteById(id);

@@ -32,11 +32,7 @@ public class ProductController {
     @Operation(summary = "Get a product by id")
     @GetMapping("/products/{id}")
     public ResponseEntity<ProductResponse> getProductById(@PathVariable Long id) {
-        try {
-            return ResponseEntity.ok(productFacade.getProductById(id));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(productFacade.getProductById(id));
     }
 
     @Operation(summary = "Create a new product")
@@ -49,20 +45,13 @@ public class ProductController {
     @Operation(summary = "Update an existing product")
     @PutMapping("/products/{id}")
     public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long id, @Valid @RequestBody ProductRequest request) {
-        try {
-            return ResponseEntity.ok(productFacade.updateProduct(id, request));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(productFacade.updateProduct(id, request));
     }
 
     @Operation(summary = "Delete a product")
     @DeleteMapping("/products/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
-        boolean deleted = productFacade.deleteProduct(id);
-        if (!deleted) {
-            return ResponseEntity.notFound().build();
-        }
+        productFacade.deleteProduct(id);
         return ResponseEntity.noContent().build();
     }
 }
