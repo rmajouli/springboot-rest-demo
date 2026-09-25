@@ -1,32 +1,72 @@
-# Spring Boot REST API Demo
+# Demo API - Spring Boot + MySQL + JPA + Swagger + Frontend
 
-This project is a simple Spring Boot application that exposes a REST API for products.
+This project contains a Spring Boot REST API with MySQL, JPA/Hibernate, a repository/service/facade architecture, Swagger/OpenAPI documentation, and a simple React frontend.
 
-## Features
-- GET all products
-- GET one product by ID
-- POST create a product
-- PUT update a product
-- DELETE remove a product
+## Project structure
 
-## Run locally
+- `src/main/java/com/example/demo` - backend application
+- `src/main/resources/application.properties` - MySQL and Swagger configuration
+- `frontend/` - React frontend application
+- `docker-compose.yml` - MySQL database container
+
+## Backend requirements
+
+- Java 17+
+- Maven 3.9+
+- Docker (to run MySQL)
+
+## Start MySQL with Docker
+
+```bash
+docker-compose up -d
+```
+
+## Run backend
 
 ```bash
 mvn spring-boot:run
 ```
 
-## Base URL
+The API will be available at:
+- http://localhost:8080/api/products
+- Swagger UI: http://localhost:8080/swagger-ui.html
+- OpenAPI JSON: http://localhost:8080/v3/api-docs
 
-```text
-http://localhost:8080/api
-```
-
-## Example endpoints
+## Example API calls
 
 ```bash
 curl http://localhost:8080/api/products
 curl http://localhost:8080/api/products/1
-curl -X POST http://localhost:8080/api/products -H "Content-Type: application/json" -d '{"name":"Monitor","price":300}'
-curl -X PUT http://localhost:8080/api/products/1 -H "Content-Type: application/json" -d '{"name":"Gaming Laptop","price":1500}'
-curl -X DELETE http://localhost:8080/api/products/1
+curl -X POST http://localhost:8080/api/products \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Monitor","price":300}'
 ```
+
+## Run frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+The frontend runs by default on:
+- http://localhost:5173
+
+## Architecture used
+
+- Controller layer
+- Facade layer
+- Service layer
+- Repository layer
+- JPA Entity layer
+- DTO layer
+
+## Technologies
+
+- Spring Boot 3
+- Spring Data JPA
+- Hibernate
+- MySQL
+- OpenAPI/Swagger
+- React + Vite

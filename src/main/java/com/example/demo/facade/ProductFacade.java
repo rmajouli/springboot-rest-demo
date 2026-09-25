@@ -1,0 +1,57 @@
+package com.example.demo.facade;
+
+import com.example.demo.dto.ProductRequest;
+import com.example.demo.dto.ProductResponse;
+import com.example.demo.entity.Product;
+import com.example.demo.service.ProductService;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+
+@Component
+public class ProductFacade {
+
+    private final ProductService productService;
+
+    public ProductFacade(ProductService productService) {
+        this.productService = productService;
+    }
+
+    public List<ProductResponse> getAllProducts() {
+        return productService.getAllProducts().stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    public ProductResponse getProductById(Long id) {
+        Product product = productService.getProductById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found with id: " + id));
+        return toResponse(product);
+    }
+
+    public ProductResponse createProduct(ProductRequest request) {
+        Product product = new Product();
+        product.setName(request.name());
+        product.setPrice(request.price());
+
+        Product savedProduct = productService.createProduct(product);
+        return toResponse(savedProduct);
+    }
+
+    public ProductResponse updateProduct(Long id, ProductRequest request) {
+        Product product = new Product();
+        product.setName(request.name());
+        product.setPrice(request.price());
+
+        Product updatedProduct = productService.updateProduct(id, product);
+        return toResponse(updatedProduct);
+    }
+
+    public boolean deleteProduct(Long id) {
+        return productService.deleteProduct(id);
+    }
+
+    private ProductResponse toResponse(Product product) {
+        return new ProductResponse(product.getId(), product.getName(), product.getPrice());
+    }
+}

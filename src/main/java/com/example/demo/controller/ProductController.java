@@ -1,73 +1,68 @@
 package com.example.demo.controller;
 
-import com.example.demo.model.Product;
+import com.example.demo.dto.ProductRequest;
+import com.example.demo.dto.ProductResponse;
+import com.example.demo.facade.ProductFacade;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
 
 @RestController
 @RequestMapping("/api")
+@Tag(name = "Products", description = "Product management endpoints")
 public class ProductController {
 
-    private final Map<Long, Product> products = new ConcurrentHashMap<>();
-    private final AtomicLong sequence = new AtomicLong(1);
+    private final ProductFacade productFacade;
 
-    public ProductController() {
-        addProduct(new Product(null, "Laptop", 1200.00));
-        addProduct(new Product(null, "Mouse", 25.50));
-        addProduct(new Product(null, "Keyboard", 60.00));
+    public ProductController(ProductFacade productFacade) {
+        this.productFacade = productFacade;
     }
 
-    private void addProduct(Product product) {
-        long id = sequence.getAndIncrement();
-        product.setId(id);
-        products.put(id, product);
-    }
-
+    @Operation(summary = "Get all products")
     @GetMapping("/products")
-    public List<Product> getAllProducts() {
-        return new ArrayList<>(products.values());
+    public List<ProductResponse> getAllProducts() {
+        return productFacade.getAllProducts();
     }
 
+    @Operation(summary = "Get a product by id")
     @GetMapping("/products/{id}")
-    public ResponseEntity<Product> getProductById(@PathVariable Long id) {
-        Product product = products.get(id);
-        if (product == null) {
+    public ResponseEntity<ProductResponse> getProductById(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(productFacade.getProductById(id));
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(product);
     }
 
+    @Operation(summary = "Create a new product")
     @PostMapping("/products")
-    public ResponseEntity<Product> createProduct(@RequestBody Product product) {
-        long id = sequence.getAndIncrement();
-        product.setId(id);
-        products.put(id, product);
-        return ResponseEntity.status(HttpStatus.CREATED).body(product);
+    public ResponseEntity<ProductResponse> createProduct(@Valid @RequestBody ProductRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(productFacade.createProduct(request));
     }
 
+    @Operation(summary = "Update an existing product")
     @PutMapping("/products/{id}")
-    public ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestBody Product product) {
-        if (!products.containsKey(id)) {
+    public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long id, @Valid @RequestBody ProductRequest request) {
+        try {
+            return ResponseEntity.ok(productFacade.updateProduct(id, request));
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
         }
-        product.setId(id);
-        products.put(id, product);
-        return ResponseEntity.ok(product);
     }
 
+    @Operation(summary = "Delete a product")
     @DeleteMapping("/products/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
-        if (!products.containsKey(id)) {
+        boolean deleted = productFacade.deleteProduct(id);
+        if (!deleted) {
             return ResponseEntity.notFound().build();
         }
-        products.remove(id);
         return ResponseEntity.noContent().build();
     }
 }
