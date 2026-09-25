@@ -12,7 +12,7 @@ This project contains a Spring Boot REST API with MySQL, JPA/Hibernate, a reposi
 ## Backend requirements
 
 - Java 17+
-- Maven 3.9+
+- Gradle 8+
 - Docker (to run MySQL)
 
 ## Start MySQL with Docker
@@ -24,7 +24,7 @@ docker-compose up -d
 ## Run backend
 
 ```bash
-mvn spring-boot:run
+./gradlew bootRun
 ```
 
 The API will be available at:
