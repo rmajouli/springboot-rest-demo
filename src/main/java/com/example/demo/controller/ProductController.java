@@ -6,11 +6,13 @@ import com.example.demo.facade.ProductFacade;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -23,10 +25,20 @@ public class ProductController {
         this.productFacade = productFacade;
     }
 
-    @Operation(summary = "Get all products")
+    @Operation(summary = "Get all products with pagination and sorting")
     @GetMapping("/products")
-    public List<ProductResponse> getAllProducts() {
-        return productFacade.getAllProducts();
+    public Page<ProductResponse> getAllProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction
+    ) {
+        Sort sort = direction.equalsIgnoreCase("desc")
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return productFacade.getAllProducts(pageable);
     }
 
     @Operation(summary = "Get a product by id")

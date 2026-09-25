@@ -3,6 +3,8 @@ package com.example.demo.service;
 import com.example.demo.entity.Product;
 import com.example.demo.exception.ProductNotFoundException;
 import com.example.demo.repository.ProductRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,6 +17,10 @@ public class ProductService {
 
     public ProductService(ProductRepository productRepository) {
         this.productRepository = productRepository;
+    }
+
+    public Page<Product> getAllProducts(Pageable pageable) {
+        return productRepository.findAll(pageable);
     }
 
     public List<Product> getAllProducts() {

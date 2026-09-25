@@ -5,6 +5,8 @@ import com.example.demo.dto.ProductResponse;
 import com.example.demo.entity.Product;
 import com.example.demo.exception.ProductNotFoundException;
 import com.example.demo.service.ProductService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -16,6 +18,11 @@ public class ProductFacade {
 
     public ProductFacade(ProductService productService) {
         this.productService = productService;
+    }
+
+    public Page<ProductResponse> getAllProducts(Pageable pageable) {
+        return productService.getAllProducts(pageable)
+                .map(this::toResponse);
     }
 
     public List<ProductResponse> getAllProducts() {

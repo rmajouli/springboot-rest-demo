@@ -1,72 +1,41 @@
-# Demo API - Spring Boot + MySQL + JPA + Swagger + Frontend
+package com.example.demo.service;
 
-This project contains a Spring Boot REST API with MySQL, JPA/Hibernate, a repository/service/facade architecture, Swagger/OpenAPI documentation, and a simple React frontend.
+import com.example.demo.entity.Product;
+import com.example.demo.exception.ProductNotFoundException;
+import com.example.demo.repository.ProductRepository;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-## Project structure
+import java.util.Optional;
 
-- `src/main/java/com/example/demo` - backend application
-- `src/main/resources/application.properties` - MySQL and Swagger configuration
-- `frontend/` - React frontend application
-- `docker-compose.yml` - MySQL database container
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 
-## Backend requirements
+@ExtendWith(MockitoExtension.class)
+class ProductServiceTest {
 
-- Java 17+
-- Maven 3.9+
-- Docker (to run MySQL)
+    @Mock
+    private ProductRepository productRepository;
 
-## Start MySQL with Docker
+    @InjectMocks
+    private ProductService productService;
 
-```bash
-docker-compose up -d
-```
+    @Test
+    void shouldThrowProductNotFoundException_WhenProductDoesNotExist() {
+        when(productRepository.findById(10L)).thenReturn(Optional.empty());
 
-## Run backend
+        Product product = new Product("Laptop", 1500.0);
 
-```bash
-mvn spring-boot:run
-```
+        assertThrows(ProductNotFoundException.class, () -> productService.updateProduct(10L, product));
+    }
 
-The API will be available at:
-- http://localhost:8080/api/products
-- Swagger UI: http://localhost:8080/swagger-ui.html
-- OpenAPI JSON: http://localhost:8080/v3/api-docs
+    @Test
+    void shouldThrowProductNotFoundException_WhenDeletingMissingProduct() {
+        when(productRepository.existsById(20L)).thenReturn(false);
 
-## Example API calls
-
-```bash
-curl http://localhost:8080/api/products
-curl http://localhost:8080/api/products/1
-curl -X POST http://localhost:8080/api/products \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Monitor","price":300}'
-```
-
-## Run frontend
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-The frontend runs by default on:
-- http://localhost:5173
-
-## Architecture used
-
-- Controller layer
-- Facade layer
-- Service layer
-- Repository layer
-- JPA Entity layer
-- DTO layer
-
-## Technologies
-
-- Spring Boot 3
-- Spring Data JPA
-- Hibernate
-- MySQL
-- OpenAPI/Swagger
-- React + Vite
+        assertThrows(ProductNotFoundException.class, () -> productService.deleteProduct(20L));
+    }
+}
