@@ -1,41 +1,72 @@
-package com.example.demo.service;
+# Demo API - Spring Boot + MySQL + JPA + Swagger + Vue.js UI
 
-import com.example.demo.entity.Product;
-import com.example.demo.exception.ProductNotFoundException;
-import com.example.demo.repository.ProductRepository;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+This project contains a Spring Boot REST API with MySQL, JPA/Hibernate, a repository/service/facade architecture, Swagger/OpenAPI documentation, and a Vue.js frontend.
 
-import java.util.Optional;
+## Project structure
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
+- `src/main/java/com/example/demo` - backend application
+- `src/main/resources/application.properties` - MySQL and Swagger configuration
+- `web-ui/` - Vue.js frontend application
+- `docker-compose.yml` - MySQL database container
 
-@ExtendWith(MockitoExtension.class)
-class ProductServiceTest {
+## Backend requirements
 
-    @Mock
-    private ProductRepository productRepository;
+- Java 17+
+- Maven 3.9+
+- Docker (to run MySQL)
 
-    @InjectMocks
-    private ProductService productService;
+## Start MySQL with Docker
 
-    @Test
-    void shouldThrowProductNotFoundException_WhenProductDoesNotExist() {
-        when(productRepository.findById(10L)).thenReturn(Optional.empty());
+```bash
+docker-compose up -d
+```
 
-        Product product = new Product("Laptop", 1500.0);
+## Run backend
 
-        assertThrows(ProductNotFoundException.class, () -> productService.updateProduct(10L, product));
-    }
+```bash
+mvn spring-boot:run
+```
 
-    @Test
-    void shouldThrowProductNotFoundException_WhenDeletingMissingProduct() {
-        when(productRepository.existsById(20L)).thenReturn(false);
+The API will be available at:
+- http://localhost:8080/api/products
+- Swagger UI: http://localhost:8080/swagger-ui.html
+- OpenAPI JSON: http://localhost:8080/v3/api-docs
 
-        assertThrows(ProductNotFoundException.class, () -> productService.deleteProduct(20L));
-    }
-}
+## Example API calls
+
+```bash
+curl http://localhost:8080/api/products
+curl http://localhost:8080/api/products/1
+curl -X POST http://localhost:8080/api/products \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Monitor","price":300}'
+```
+
+## Run frontend
+
+```bash
+cd web-ui
+npm install
+npm run dev
+```
+
+The frontend runs by default on:
+- http://localhost:5173
+
+## Architecture used
+
+- Controller layer
+- Facade layer
+- Service layer
+- Repository layer
+- JPA Entity layer
+- DTO layer
+
+## Technologies
+
+- Spring Boot 3
+- Spring Data JPA
+- Hibernate
+- MySQL
+- OpenAPI/Swagger
+- Vue.js + Vite
